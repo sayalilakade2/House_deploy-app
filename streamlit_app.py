@@ -1,70 +1,51 @@
-import tkinter as tk
-from sklearn.tree import DecisionTreeRegressor
-import pandas as pd
+import pickle
+import numpy as np
+import streamlit as st
 
-# Load the dataset
-data = pd.read_csv('House.csv')
+# Load the model
+loaded_model = pickle.load(open(r"C:\Users\sayal\Downloads\trained_model.sav", 'rb'))
 
-# Extract features and target variable
-X = data[['bedrooms', 'bathrooms', 'sqft_living', 'sqft_lot', 'floors', 
-          'waterfront', 'view', 'condition', 'sqft_above', 'sqft_basement', 
-          'yr_built', 'yr_renovated']]
-y = data['price']
+def DecisionTreeRegressor(input_data):
+    input_data_asarray = np.asarray(input_data)
+    input_data_reshaped = input_data_asarray.reshape(1, -1) 
+    prediction = loaded_model.predict(input_data_reshaped)
+    return prediction
 
-# Train the regression model
-model = DecisionTreeRegressor()  # Instantiate DecisionTreeRegressor
-model.fit(X, y)  # Call fit() on the instantiated model
-
-def predict_price():
+def predict_price(entries):
     try:
         # Get user input
-        bedrooms = int(entries[0].get())
-        bathrooms = float(entries[1].get())
-        sqft_living = int(entries[2].get())
-        sqft_lot = int(entries[3].get())
-        floors = float(entries[4].get())
-        waterfront = int(entries[5].get())
-        view = int(entries[6].get())
-        condition = int(entries[7].get())
-        sqft_above = int(entries[8].get())
-        sqft_basement = int(entries[9].get())
-        yr_built = int(entries[10].get())
-        yr_renovated =int(entries[11].get())
+        input_data = [int(entries[0]), float(entries[1]), int(entries[2]), int(entries[3]), 
+                      float(entries[4]), int(entries[5]), int(entries[6]), int(entries[7]), 
+                      int(entries[8]), int(entries[9]), int(entries[10]), int(entries[11])]
         
         # Perform prediction
-        predicted_price = model.predict([[bedrooms, bathrooms, sqft_living, sqft_lot, floors, 
-                                           waterfront, view, condition, sqft_above, sqft_basement, 
-                                           yr_built, yr_renovated]])[0]
-        result_label.config(text=f"The predicted price is ${predicted_price:,.2f}")
+        predicted_price = DecisionTreeRegressor(input_data)[0]
+        return f"The predicted price is ${predicted_price:,.2f}"
     except ValueError:
-        result_label.config(text="Please enter valid inputs.")
+        return "Please enter valid inputs."
 
-# Create GUI window
-window = tk.Tk()
-window.title("House Price Prediction")
-
-# Create labels and entry fields for user input
-labels = ['Bedrooms:', 'Bathrooms:', 'Sqft Living:', 'Sqft Lot:', 'Floors:', 
-          'Waterfront:', 'View:', 'Condition:', 'Sqft Above:', 'Sqft Basement:', 
-          'Year Built:', 'Year Renovated:']
-
-entries = []
-for i, label_text in enumerate(labels):
-    tk.Label(window, text=label_text).grid(row=i, column=0)
-    entry = tk.Entry(window)
-    entry.grid(row=i, column=1)
-    entries.append(entry)
-
-# Create a button to trigger prediction
-predict_button = tk.Button(window, text="Predict Price", command=predict_price)
-predict_button.grid(row=len(labels), columnspan=2)
+        
+ 
 
 
-# Create label to display prediction result
-result_label = tk.Label(window, text="")
-result_label.grid(row=len(labels)+1, columnspan=2)
+def main():
+    st.title("House Price Prediction")
+    entries = []
+    for feature in ['Bedrooms:', 'Bathrooms:', 'Sqft Living:', 'Sqft Lot:', 'Floors:', 
+                    'Waterfront:', 'View:', 'Condition:', 'Sqft Above:', 'Sqft Basement:', 
+                    'Year Built:', 'Year Renovated:']:
+        entries.append(st.number_input(feature))
+    
+    if st.button('Predict Price'):
+        result = predict_price(entries)
+        st.success(result)
 
-window.mainloop()
+if __name__ == '__main__':
+    main()
+
+
+
+
 
 
 
