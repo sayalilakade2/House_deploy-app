@@ -1,7 +1,8 @@
+import requests
 import pandas as pd
 import numpy as np
+from sklearn.preprocessing import LabelEncoder
 import streamlit as st
-import requests
 import joblib
 
 # Download the model from GitHub
