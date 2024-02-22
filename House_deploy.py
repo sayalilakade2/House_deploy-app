@@ -11,14 +11,9 @@ import streamlit as st
 import requests
 import joblib
 
-# Download the model from GitHub
-model_url = 'https://github.com/sayalilakade2/House_deploy-app/raw/main/trained_model.sav' 
-r = requests.get(model_url)
-with open('trained_model.sav', 'wb') as f:
-    f.write(r.content)
-
 # Load the model from the file
-ensemble_best = joblib.load('trained_model.sav')
+model_path = "/path/to/trained_model.sav"
+ensemble_best = joblib.load(model_path)
 
 # Streamlit app
 st.sidebar.header('User Input Parameters')           
@@ -56,7 +51,6 @@ def main():
 
 if __name__ == '__main__':
     main()
-
 
 
 
