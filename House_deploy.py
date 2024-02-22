@@ -5,17 +5,28 @@ Created on Mon Feb 19 17:29:11 2024
 @author: sayali
 """
 
-import pickle
+import pandas as pd
 import numpy as np
 import streamlit as st
+import requests
+import joblib
 
-# Load the model
-loaded_model = pickle.load(open(r"C:\Users\sayal\Downloads\trained_model.sav", 'rb'))
+# Download the model from GitHub
+model_url = 'https://github.com/sayalilakade2/House_deploy-app/raw/main/trained_model.sav' 
+r = requests.get(model_url)
+with open('trained_model.sav', 'wb') as f:
+    f.write(r.content)
+
+# Load the model from the file
+ensemble_best = joblib.load('trained_model.sav')
+
+# Streamlit app
+st.sidebar.header('User Input Parameters')           
 
 def DecisionTreeRegressor(input_data):
     input_data_asarray = np.asarray(input_data)
     input_data_reshaped = input_data_asarray.reshape(1, -1) 
-    prediction = loaded_model.predict(input_data_reshaped)
+    prediction = ensemble_best.predict(input_data_reshaped)
     return prediction
 
 def predict_price(entries):
@@ -31,10 +42,6 @@ def predict_price(entries):
     except ValueError:
         return "Please enter valid inputs."
 
-        
- 
-
-
 def main():
     st.title("House Price Prediction")
     entries = []
@@ -49,6 +56,7 @@ def main():
 
 if __name__ == '__main__':
     main()
+
 
 
 
