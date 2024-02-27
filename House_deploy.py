@@ -6,16 +6,18 @@ import joblib
 
 # Load the model
 #loaded_model = pickle.load(open(r"https://raw.githubusercontent.com/ManasiBhavsar/sayali-house-price/blob/main/sayali_model.sav", 'rb'))
-model_url="https://github.com/sayalilakade2/House_deploy-app/blob/main/finalized_model.sav"
-r=requests.get(model_url)
+# Load the model
+model_url = "https://github.com/sayalilakade2/House_deploy-app/raw/main/finalized_model.sav"
+r = requests.get(model_url)
 
-if r.status_code==200:
-    with open('finalized_model.sav','wb') as f:
+if r.status_code == 200:
+    with open('finalized_model.sav', 'wb') as f:
         f.write(r.content)
 else:
     print("Failed to download the model file")
-    
+
 model = joblib.load('finalized_model.sav')
+
 
 def DecisionTreeRegressor(input_data):
     input_data_asarray = np.asarray(input_data)
