@@ -5,7 +5,7 @@ import requests
 import joblib
 
 # Load the model
-#loaded_model = pickle.load(open(r"https://raw.githubusercontent.com/ManasiBhavsar/sayali-house-price/blob/main/sayali_model.sav", 'rb'))
+#loaded_model = pickle.load(open(r"https://github.com/sayalilakade2/House_deploy-app/raw/main/finalized_model.sav", 'rb'))
 # Load the model
 model_url = "https://github.com/sayalilakade2/House_deploy-app/raw/main/finalized_model.sav"
 r = requests.get(model_url)
