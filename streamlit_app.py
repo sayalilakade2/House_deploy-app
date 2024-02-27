@@ -12,7 +12,7 @@ r=requests.get(model_url)
 if r.status_code==200:
     with open('finalized_model.sav','wb') as f:
         f.write(r.content)
-else:
+        loaded_model = pickle.load(f)
     print("Failed to download the model file")
 loaded_model = joblib.load('finalized_model.sav')
 def DecisionTreeRegressor(input_data):
