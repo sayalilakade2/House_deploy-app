@@ -3,6 +3,8 @@ import numpy as np
 import streamlit as st
 import requests
 import joblib
+pip install protobuf==3.20.*
+
 
 # Load the model
 #loaded_model = pickle.load(open(r"https://github.com/sayalilakade2/House_deploy-app/raw/main/finalized_model.sav", 'rb'))
