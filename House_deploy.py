@@ -4,6 +4,8 @@ import streamlit as st
 import requests
 import joblib
 pip install protobuf==3.20.*
+set PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python
+
 
 
 # Load the model
