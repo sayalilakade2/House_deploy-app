@@ -3,60 +3,66 @@ import numpy as np
 import streamlit as st
 import requests
 import joblib
-pip install protobuf==3.20.*
-set PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python
+import os
 
+# Ensure correct protobuf version is installed
+os.system("pip install protobuf==3.20.*")
+os.environ["PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION"] = "python"
 
-
-# Load the model
-#loaded_model = pickle.load(open(r"https://github.com/sayalilakade2/House_deploy-app/raw/main/finalized_model.sav", 'rb'))
-# Load the model
+# Download the model file if it doesn't already exist
+model_filename = "finalized_model.sav"
 model_url = "https://github.com/sayalilakade2/House_deploy-app/raw/main/finalized_model.sav"
-r = requests.get(model_url)
 
-if r.status_code == 200:
-    with open('finalized_model.sav', 'wb') as f:
-        f.write(r.content)
-else:
-    print("Failed to download the model file")
+if not os.path.exists(model_filename):
+    r = requests.get(model_url)
+    if r.status_code == 200:
+        with open(model_filename, 'wb') as f:
+            f.write(r.content)
+    else:
+        st.error("Failed to download the model file. Please check the URL or internet connection.")
 
-model = joblib.load('finalized_model.sav')
+# Load the model
+try:
+    model = joblib.load(model_filename)
+except Exception as e:
+    st.error(f"Error loading model: {e}")
+    st.stop()
 
-
+# Function to predict using the Decision Tree Regressor
 def DecisionTreeRegressor(input_data):
     input_data_asarray = np.asarray(input_data)
-    input_data_reshaped = input_data_asarray.reshape(1, -1) 
+    input_data_reshaped = input_data_asarray.reshape(1, -1)
     prediction = model.predict(input_data_reshaped)
     return prediction
 
-def predict_price(entries):
-    try:
-        # Get user input
-        input_data = [int(entries[0]), float(entries[1]), int(entries[2]), int(entries[3]), 
-                      float(entries[4]), int(entries[5]), int(entries[6]), int(entries[7]), 
-                      int(entries[8]), int(entries[9]), int(entries[10]), int(entries[11])]
-        
-        # Perform prediction
-        predicted_price = DecisionTreeRegressor(input_data)[0]
-        return f"The predicted price is ${predicted_price:,.2f}"
-    except ValueError:
-        return "Please enter valid inputs."
-
-        
- 
-
-
+# Streamlit app for house price prediction
 def main():
-    st.title("House Price Prediction")
+    st.title("House Price Prediction App")
+    st.write("Enter the details of the house to predict its price:")
+
+    # Create input fields for user data
     entries = []
-    for feature in ['Bedrooms:', 'Bathrooms:', 'Sqft Living:', 'Sqft Lot:', 'Floors:', 
-                    'Waterfront:', 'View:', 'Condition:', 'Sqft Above:', 'Sqft Basement:', 
-                    'Year Built:', 'Year Renovated:']:
-        entries.append(st.number_input(feature))
+    features = [
+        'Bedrooms', 'Bathrooms', 'Sqft Living', 'Sqft Lot', 'Floors', 
+        'Waterfront', 'View', 'Condition', 'Sqft Above', 'Sqft Basement', 
+        'Year Built', 'Year Renovated'
+    ]
     
+    for feature in features:
+        if feature in ['Bedrooms', 'Bathrooms', 'Floors', 'Waterfront', 'View', 'Condition', 'Year Built', 'Year Renovated']:
+            entries.append(st.number_input(feature, step=1, value=0))
+        else:
+            entries.append(st.number_input(feature, step=0.1, value=0.0))
+    
+    # Predict button
     if st.button('Predict Price'):
-        result = predict_price(entries)
-        st.success(result)
+        try:
+            predicted_price = DecisionTreeRegressor(entries)[0]
+            st.success(f"The predicted price is ${predicted_price:,.2f}")
+        except ValueError as e:
+            st.error(f"Error during prediction: {e}")
+        except Exception as e:
+            st.error(f"An unexpected error occurred: {e}")
 
 if __name__ == '__main__':
     main()
